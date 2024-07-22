@@ -1,0 +1,140 @@
+{% include "header.html" %}
+{% load static %}
+<div class="container mt-5">
+  <div class="row">
+      <!-- UPI and Wallets Section -->
+      <div class="col-md-7">
+          <!-- UPI Section -->
+          <div class="card mb-4">
+              <div class="card-body">
+                  <h4 class="card-title "><b> <u>Customer Details</u> </b></h4>
+
+                  <br>
+                  
+                  <div class="row align-items-center">
+                      <div class="col-sm-8 mb-2 mb-sm-0">
+                        <p><strong>Customer Name:</strong> {{request.user.username}}</p>
+                        <p><strong>Customer Email ID:</strong>{{request.user.email}}</p>
+                        <p><strong>Customer Mobile:</strong>7769066351</p>
+                      </div>
+                      <div class="col-sm-4">
+                        <button id="rzp-button1">Pay with Razorpay</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Wallets Section -->
+          <div class="card">
+              <div class="card-body">
+                <h4 class="card-title "><b> <u>Order Summary</u> </b></h4>
+                  <div class="row ">
+                    
+                    {% for cart in carts %}
+                    
+                    <div class="col-md-2"  width="100%">
+                        <img src="{{cart.pid.pimage.url}}" class="card-img" alt="LEGO Hogwarts" style="object-fit: contain;" height="200px" >
+                    </div>
+                    
+                    <div class="col-md-10">
+                        <div class="card-body">
+                            <h5 class="card-title"> {{cart.pid.pname}}</h5>
+                            <p class="card-text">Ref:169928</p>
+                            <span class="card-text"><b>₹{{cart.pid.price}}</b></span>
+                            <br>
+                            <br>
+                            
+                            
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Bill Summary Section -->
+      <div class="col-md-5">
+          <div class="card">
+              <div class="card-body">
+                <h4 class="card-title "><b> <u>Bill Summary</u> </b></h4>
+                  <ul class="list-group list-group-flush">
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                          MRP
+                          <span>₹{{total}}</span>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                          Discount
+                          <span>- ₹0.00</span>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                          Discounted Value
+                          <span>₹0.0</span>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                          Delivery Fee
+                          <span>₹100.00</span>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                          Handling Fee
+                          <span>₹0.00</span>
+                      </li>
+                  </ul>
+              </div>
+              <div class="card-footer d-flex justify-content-between align-items-center">
+                  <strong>Amount to be paid</strong>
+                  <strong>₹{{total}}</strong>
+              </div>
+              <div class="card-footer text-center bg-light">
+                  <span>₹9.68 Saved in this order</span>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                <script>
+                 var options = {
+                    "key": "rzp_test_I7C0Tt7if7jjRS", // Enter the Key ID generated from the Dashboard
+                    "amount": '{{payment.amount}}', // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                    "currency": "INR",
+                    "name": "Ecomere.pvt ltd",
+                    "description": "Test Transaction",
+                    "image": "https://example.com/your_logo",
+                    "order_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                    "handler": function (response){
+                       // alert(response.razorpay_payment_id);
+                       // alert(response.razorpay_order_id);
+                       // alert(response.razorpay_signature)
+                       window.location.href="http://127.0.0.1:8000/paymentsuccess"
+                    },
+                    "prefill": {
+                        "name": "Gaurav Kumar",
+                        "email": "gaurav.kumar@example.com",
+                        "contact": "9000090000"
+                    },
+                    "notes": {
+                        "address": "Razorpay Corporate Office"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function (response){
+                        alert(response.error.code);
+                        alert(response.error.description);
+                        alert(response.error.source);
+                        alert(response.error.step);
+                        alert(response.error.reason);
+                        alert(response.error.metadata.order_id);
+                        alert(response.error.metadata.payment_id);
+                });
+                document.getElementById('rzp-button1').onclick = function(e){
+                    rzp1.open();
+                    e.preventDefault();
+                }
+                </script>
+
+
+    {% include "footer.html" %}
